@@ -13,3 +13,40 @@ Compress middleware for [Gem](https://github.com/go-gem/gem) Web framework.
 ```
 $ go get -u github.com/go-gem/middleware-compress
 ```
+
+**Compress Levels**
+
+- gzip.DefaultCompression
+- gzip.BestSpeed
+- gzip.BestCompression
+
+Note: the other levels would trigger panic.
+
+**Example**
+
+```
+package main
+
+import (
+	"compress/gzip"
+	"log"
+	"net/http"
+	"os"
+
+	"github.com/go-gem/gem"
+	"github.com/go-gem/middleware-compress"
+)
+
+func main() {
+	compressMidware := compressmidware.New(gzip.BestCompression)
+
+	router := gem.NewRouter()
+	router.ServeFiles(
+		"/tmp1/*filepath", http.Dir(os.TempDir()),
+		&gem.HandlerOption{Middlewares: []gem.Middleware{compressMidware}},
+	)
+	router.ServeFiles("/tmp2/*filepath", http.Dir(os.TempDir()))
+
+	log.Println(gem.ListenAndServe(":8080", router.Handler()))
+}
+```
